@@ -25,15 +25,24 @@
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; background-color: #f0f0f0; }
     #app { display: flex; flex-direction: column; align-items: center; padding: 20px; }
-    .hidden-video { display: none; } /* Hide the video element used for tracking input */
+    .video-container {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        opacity: 0;
+    }
   </style>
 </head>
 <body>
   <!-- Video element required for MediaPipe processing -->
-  <video class="hidden-video" id="videoInput" playsinline></video>
+  <div class="video-container">
+      <video id="videoInput" playsinline></video>
+  </div>
   <div id="app"></div>
   <script type="module" src="./main.jsx"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
-

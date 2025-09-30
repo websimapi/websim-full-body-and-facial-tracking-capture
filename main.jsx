@@ -17,9 +17,13 @@ const App = () => {
   const [recordedData, setRecordedData] = useState([]);
   const [statusMessage, setStatusMessage] = useState("Initializing camera and tracking model...");
   useEffect(() => {
-    initializeHolistic(() => {
+    initializeHolistic().then(() => {
       setIsCameraInitialized(true);
       setStatusMessage("Ready. Press 'Start Recording' when ready to move.");
+    }).catch((err) => {
+      console.error("Initialization failed:", err);
+      setStatusMessage("Error: Failed to access webcam. Please grant permissions and refresh.");
+      alert("Could not start camera. Please ensure you have a webcam connected and have granted permissions to this page.");
     });
   }, []);
   const handleStartRecording = useCallback(() => {
@@ -32,7 +36,7 @@ const App = () => {
       setRecordedData([]);
       setStatusMessage("\u{1F534} Recording... capturing full body and facial data.");
     } else {
-      setStatusMessage("Error: Could not start recording. Check console for camera access issues.");
+      setStatusMessage("Error: Could not start recording. Check console for issues.");
     }
   }, [isCameraInitialized]);
   const handleStopRecording = useCallback(() => {
@@ -47,22 +51,19 @@ const App = () => {
     }
   }, []);
   const handleDownload = useCallback(() => {
-    if (isCurrentlyRecording()) {
-      handleStopRecording();
-    }
     downloadTrackingData();
-  }, [handleStopRecording]);
+  }, []);
   const durationInFrames = useMemo(() => recordedData.length, [recordedData]);
   const showPlayer = durationInFrames > 0;
   return /* @__PURE__ */ jsxDEV("div", { style: { padding: 20, maxWidth: 900, margin: "0 auto" }, children: [
     /* @__PURE__ */ jsxDEV("h1", { children: "Webcam Tracking Data Capture (Hidden Feed)" }, void 0, false, {
       fileName: "<stdin>",
-      lineNumber: 66,
+      lineNumber: 69,
       columnNumber: 13
     }),
     /* @__PURE__ */ jsxDEV("p", { children: "Uses MediaPipe Holistic to capture 3D body, hand, and 2D facial tracking data without displaying the raw webcam feed. The output is a sequence of landmark coordinates ready for video composition." }, void 0, false, {
       fileName: "<stdin>",
-      lineNumber: 67,
+      lineNumber: 70,
       columnNumber: 13
     }),
     /* @__PURE__ */ jsxDEV("div", { style: {
@@ -77,7 +78,7 @@ const App = () => {
         statusMessage
       ] }, void 0, true, {
         fileName: "<stdin>",
-        lineNumber: 76,
+        lineNumber: 79,
         columnNumber: 17
       }),
       /* @__PURE__ */ jsxDEV("div", { style: { marginTop: "15px", display: "flex", gap: "10px" }, children: [
@@ -86,14 +87,14 @@ const App = () => {
           {
             onClick: handleStartRecording,
             disabled: !isCameraInitialized || isRecordingState,
-            style: { padding: "10px 20px", backgroundColor: isRecordingState ? "#aaa" : "green", color: "white", border: "none", borderRadius: "5px", cursor: isRecordingState ? "not-allowed" : "pointer", fontWeight: "bold" },
+            style: { padding: "10px 20px", backgroundColor: !isCameraInitialized || isRecordingState ? "#aaa" : "green", color: "white", border: "none", borderRadius: "5px", cursor: !isCameraInitialized || isRecordingState ? "not-allowed" : "pointer", fontWeight: "bold" },
             children: isRecordingState ? "Recording (Do Not Refresh)" : "Start Recording"
           },
           void 0,
           false,
           {
             fileName: "<stdin>",
-            lineNumber: 79,
+            lineNumber: 82,
             columnNumber: 21
           }
         ),
@@ -102,14 +103,14 @@ const App = () => {
           {
             onClick: handleStopRecording,
             disabled: !isRecordingState,
-            style: { padding: "10px 20px", backgroundColor: "orange", color: "white", border: "none", borderRadius: "5px", cursor: !isRecordingState ? "not-allowed" : "pointer" },
+            style: { padding: "10px 20px", backgroundColor: !isRecordingState ? "#aaa" : "orange", color: "white", border: "none", borderRadius: "5px", cursor: !isRecordingState ? "not-allowed" : "pointer" },
             children: "Stop Recording"
           },
           void 0,
           false,
           {
             fileName: "<stdin>",
-            lineNumber: 86,
+            lineNumber: 89,
             columnNumber: 21
           }
         ),
@@ -117,11 +118,11 @@ const App = () => {
           "button",
           {
             onClick: handleDownload,
-            disabled: isRecordingState || recordedData.length === 0,
-            style: { padding: "10px 20px", backgroundColor: "blue", color: "white", border: "none", borderRadius: "5px", cursor: isRecordingState || recordedData.length === 0 ? "not-allowed" : "pointer" },
+            disabled: recordedData.length === 0,
+            style: { padding: "10px 20px", backgroundColor: recordedData.length === 0 ? "#aaa" : "blue", color: "white", border: "none", borderRadius: "5px", cursor: recordedData.length === 0 ? "not-allowed" : "pointer" },
             children: [
               "Download JSON Data (",
-              recordedData.length,
+              getRecordedData().length,
               " frames)"
             ]
           },
@@ -129,24 +130,24 @@ const App = () => {
           true,
           {
             fileName: "<stdin>",
-            lineNumber: 93,
+            lineNumber: 96,
             columnNumber: 21
           }
         )
       ] }, void 0, true, {
         fileName: "<stdin>",
-        lineNumber: 78,
+        lineNumber: 81,
         columnNumber: 17
       })
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 69,
+      lineNumber: 72,
       columnNumber: 13
     }),
     showPlayer && /* @__PURE__ */ jsxDEV("div", { style: { marginTop: 30, width: "100%", aspectRatio: "540 / 960", maxWidth: "400px", margin: "30px auto" }, children: [
       /* @__PURE__ */ jsxDEV("h2", { children: "Tracking Visualization Preview (540x960 Portrait)" }, void 0, false, {
         fileName: "<stdin>",
-        lineNumber: 105,
+        lineNumber: 108,
         columnNumber: 21
       }),
       /* @__PURE__ */ jsxDEV(
@@ -167,23 +168,23 @@ const App = () => {
         false,
         {
           fileName: "<stdin>",
-          lineNumber: 106,
+          lineNumber: 109,
           columnNumber: 21
         }
       )
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 104,
+      lineNumber: 107,
       columnNumber: 17
     })
   ] }, void 0, true, {
     fileName: "<stdin>",
-    lineNumber: 65,
+    lineNumber: 68,
     columnNumber: 9
   });
 };
 createRoot(document.getElementById("app")).render(/* @__PURE__ */ jsxDEV(App, {}, void 0, false, {
   fileName: "<stdin>",
-  lineNumber: 124,
+  lineNumber: 127,
   columnNumber: 51
 }));

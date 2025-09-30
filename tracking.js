@@ -8,14 +8,17 @@ let holistic;
 let camera;
 let videoElement;
 let currentFrame = 0;
+let isInitialized = false;
 
-export const initializeHolistic = (onReadyCallback) => {
+export const initializeHolistic = async () => {
+    if (isInitialized) return;
+
     videoElement = document.getElementById('videoInput');
 
     // 1. Initialize Holistic Model
     holistic = new Holistic({
         locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5/${file}`;
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1633596781/${file}`;
         }
     });
 
@@ -32,33 +35,16 @@ export const initializeHolistic = (onReadyCallback) => {
     holistic.onResults(onResults);
 
     // 2. Setup camera stream
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        camera = new Camera(videoElement, {
-            onFrame: async () => {
-                // Ensure the model processes frames only if the video is ready
-                if (videoElement.readyState >= 3) {
-                    await holistic.send({ image: videoElement });
-                }
-            },
-            width: 640,
-            height: 480
-        });
-        camera.start().then(() => {
-            console.log("Camera started successfully.");
-            // Ensure video element size is set so MediaPipe works correctly
-            videoElement.width = 640;
-            videoElement.height = 480;
-            if (onReadyCallback) {
-                onReadyCallback();
-            }
-        }).catch(err => {
-            console.error("Failed to start camera:", err);
-            // We alert the user if camera fails, as the application cannot proceed without it
-            alert("Error accessing webcam. Please ensure permissions are granted.");
-        });
-    } else {
-        alert("Your browser does not support getUserMedia.");
-    }
+    camera = new Camera(videoElement, {
+        onFrame: async () => {
+            await holistic.send({ image: videoElement });
+        },
+        width: 640,
+        height: 480
+    });
+    await camera.start();
+    isInitialized = true;
+    console.log("Holistic and camera initialized successfully.");
 }
 
 function onResults(results) {
@@ -77,10 +63,8 @@ function onResults(results) {
 }
 
 export const startRecording = () => {
-    // Check if the camera stream is active (though the video element is hidden, it needs to be streaming)
-    if (!videoElement || videoElement.paused || videoElement.ended) {
-        // We cannot reliably check if MediaPipe is 100% ready, but if the camera isn't running, it won't work.
-        console.error("Camera is not running or tracking model is not initialized.");
+    if (!isInitialized) {
+        console.error("Tracking model is not initialized.");
         return false;
     }
     if (isRecording) return true;
@@ -103,13 +87,19 @@ export const getRecordedData = () => {
 }
 
 export const downloadTrackingData = () => {
-    stopRecording();
-    if (recordedTrackingData.length === 0) {
+    // Ensure recording is stopped before downloading
+    if (isRecording) {
+        stopRecording();
+    }
+    
+    const dataToDownload = getRecordedData();
+
+    if (dataToDownload.length === 0) {
         alert("No tracking data recorded.");
         return;
     }
 
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(recordedTrackingData));
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToDownload));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
     downloadAnchorNode.setAttribute("download", `tracking_data_${Date.now()}.json`);
@@ -121,4 +111,3 @@ export const downloadTrackingData = () => {
 export const isCurrentlyRecording = () => {
     return isRecording;
 }
-
