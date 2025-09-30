@@ -40,7 +40,11 @@ const App = () => {
     const data = getRecordedData();
     setRecordedData(data);
     setIsRecordingState(false);
-    setStatusMessage(`Recording stopped. Captured ${data.length} frames. Preview available below.`);
+    if (data.length > 0) {
+      setStatusMessage(`Recording stopped. Captured ${data.length} frames. Preview available below.`);
+    } else {
+      setStatusMessage(`Recording stopped. No frames captured. Ensure you are visible to the camera.`);
+    }
   }, []);
   const handleDownload = useCallback(() => {
     if (isCurrentlyRecording()) {
@@ -53,12 +57,12 @@ const App = () => {
   return /* @__PURE__ */ jsxDEV("div", { style: { padding: 20, maxWidth: 900, margin: "0 auto" }, children: [
     /* @__PURE__ */ jsxDEV("h1", { children: "Webcam Tracking Data Capture (Hidden Feed)" }, void 0, false, {
       fileName: "<stdin>",
-      lineNumber: 62,
+      lineNumber: 66,
       columnNumber: 13
     }),
     /* @__PURE__ */ jsxDEV("p", { children: "Uses MediaPipe Holistic to capture 3D body, hand, and 2D facial tracking data without displaying the raw webcam feed. The output is a sequence of landmark coordinates ready for video composition." }, void 0, false, {
       fileName: "<stdin>",
-      lineNumber: 63,
+      lineNumber: 67,
       columnNumber: 13
     }),
     /* @__PURE__ */ jsxDEV("div", { style: {
@@ -73,7 +77,7 @@ const App = () => {
         statusMessage
       ] }, void 0, true, {
         fileName: "<stdin>",
-        lineNumber: 72,
+        lineNumber: 76,
         columnNumber: 17
       }),
       /* @__PURE__ */ jsxDEV("div", { style: { marginTop: "15px", display: "flex", gap: "10px" }, children: [
@@ -89,7 +93,7 @@ const App = () => {
           false,
           {
             fileName: "<stdin>",
-            lineNumber: 75,
+            lineNumber: 79,
             columnNumber: 21
           }
         ),
@@ -105,7 +109,7 @@ const App = () => {
           false,
           {
             fileName: "<stdin>",
-            lineNumber: 82,
+            lineNumber: 86,
             columnNumber: 21
           }
         ),
@@ -125,24 +129,24 @@ const App = () => {
           true,
           {
             fileName: "<stdin>",
-            lineNumber: 89,
+            lineNumber: 93,
             columnNumber: 21
           }
         )
       ] }, void 0, true, {
         fileName: "<stdin>",
-        lineNumber: 74,
+        lineNumber: 78,
         columnNumber: 17
       })
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 65,
+      lineNumber: 69,
       columnNumber: 13
     }),
     showPlayer && /* @__PURE__ */ jsxDEV("div", { style: { marginTop: 30, width: "100%", aspectRatio: "540 / 960", maxWidth: "400px", margin: "30px auto" }, children: [
       /* @__PURE__ */ jsxDEV("h2", { children: "Tracking Visualization Preview (540x960 Portrait)" }, void 0, false, {
         fileName: "<stdin>",
-        lineNumber: 101,
+        lineNumber: 105,
         columnNumber: 21
       }),
       /* @__PURE__ */ jsxDEV(
@@ -163,23 +167,23 @@ const App = () => {
         false,
         {
           fileName: "<stdin>",
-          lineNumber: 102,
+          lineNumber: 106,
           columnNumber: 21
         }
       )
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 100,
+      lineNumber: 104,
       columnNumber: 17
     })
   ] }, void 0, true, {
     fileName: "<stdin>",
-    lineNumber: 61,
+    lineNumber: 65,
     columnNumber: 9
   });
 };
 createRoot(document.getElementById("app")).render(/* @__PURE__ */ jsxDEV(App, {}, void 0, false, {
   fileName: "<stdin>",
-  lineNumber: 120,
+  lineNumber: 124,
   columnNumber: 51
 }));

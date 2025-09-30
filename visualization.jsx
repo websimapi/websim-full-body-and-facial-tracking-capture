@@ -123,7 +123,7 @@ const HAND_CONNECTIONS = [
   [13, 17]
   // Palm connections (simplified)
 ].map(([start, end]) => ({ start, end }));
-const drawLandmarks = (landmarks, connections, color, dotSize, lineColor) => {
+const drawLandmarks = (landmarks, connections, color, dotSize, lineColor, keyPrefix) => {
   if (!landmarks || landmarks.length === 0) return [];
   const elements = [];
   connections.forEach(({ start, end }) => {
@@ -138,7 +138,7 @@ const drawLandmarks = (landmarks, connections, color, dotSize, lineColor) => {
           color: lineColor,
           thickness: 3
         },
-        `line-${start}-${end}-${Math.random()}`,
+        `line-${keyPrefix}-${start}-${end}`,
         false,
         {
           fileName: "<stdin>",
@@ -158,7 +158,7 @@ const drawLandmarks = (landmarks, connections, color, dotSize, lineColor) => {
           color,
           size: dotSize
         },
-        `dot-${index}-${Math.random()}`,
+        `dot-${keyPrefix}-${index}`,
         false,
         {
           fileName: "<stdin>",
@@ -177,13 +177,13 @@ const TrackingVisualization = ({ trackingData = [] }) => {
     return trackingData[index] || null;
   }, [frame, trackingData]);
   if (!currentData) {
-    return /* @__PURE__ */ jsxDEV(AbsoluteFill, { style: { backgroundColor: "#111", justifyContent: "center", alignItems: "center" }, children: [
+    return /* @__PURE__ */ jsxDEV(AbsoluteFill, { style: { backgroundColor: "#111", justifyContent: "center", alignItems: "center", textAlign: "center", padding: 20 }, children: [
       /* @__PURE__ */ jsxDEV("h1", { style: { color: "white", fontSize: 36 }, children: "Tracking Data Preview" }, void 0, false, {
         fileName: "<stdin>",
         lineNumber: 137,
         columnNumber: 13
       }),
-      /* @__PURE__ */ jsxDEV("p", { style: { color: "white" }, children: "Start recording to see visualization." }, void 0, false, {
+      /* @__PURE__ */ jsxDEV("p", { style: { color: "white", fontSize: 20 }, children: "Start a recording and then stop it to see the visualization here." }, void 0, false, {
         fileName: "<stdin>",
         lineNumber: 138,
         columnNumber: 13
@@ -196,15 +196,15 @@ const TrackingVisualization = ({ trackingData = [] }) => {
   }
   const { poseLandmarks, faceLandmarks, leftHandLandmarks, rightHandLandmarks } = currentData;
   const elements = [];
-  elements.push(...drawLandmarks(poseLandmarks, POSE_CONNECTIONS, "lime", 8, "green"));
-  elements.push(...drawLandmarks(faceLandmarks, [], "yellow", 2, "yellow"));
-  elements.push(...drawLandmarks(leftHandLandmarks, HAND_CONNECTIONS, "cyan", 5, "blue"));
-  elements.push(...drawLandmarks(rightHandLandmarks, HAND_CONNECTIONS, "magenta", 5, "purple"));
+  elements.push(...drawLandmarks(poseLandmarks, POSE_CONNECTIONS, "lime", 8, "green", "pose"));
+  elements.push(...drawLandmarks(faceLandmarks, [], "yellow", 2, "yellow", "face"));
+  elements.push(...drawLandmarks(leftHandLandmarks, HAND_CONNECTIONS, "cyan", 5, "blue", "leftHand"));
+  elements.push(...drawLandmarks(rightHandLandmarks, HAND_CONNECTIONS, "magenta", 5, "purple", "rightHand"));
   return /* @__PURE__ */ jsxDEV(AbsoluteFill, { style: { backgroundColor: "#111" }, children: [
     elements,
-    /* @__PURE__ */ jsxDEV("div", { style: { position: "absolute", bottom: 10, left: 10, color: "white", fontSize: 24, zIndex: 20 }, children: [
+    /* @__PURE__ */ jsxDEV("div", { style: { position: "absolute", bottom: 10, left: 10, color: "white", fontSize: 24, zIndex: 20, textShadow: "1px 1px 2px black" }, children: [
       "Frame: ",
-      frame + 1,
+      Math.floor(frame) + 1,
       " / ",
       trackingData.length
     ] }, void 0, true, {
